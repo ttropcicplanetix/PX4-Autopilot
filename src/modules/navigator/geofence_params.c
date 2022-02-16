@@ -160,7 +160,7 @@ PARAM_DEFINE_FLOAT(GF_BUFFER_DIST, 10.0f);
  * @value 5 Land mode
  * @group Geofence
  */
-PARAM_DEFINE_INT32(GF_BUFFER_ACTION, 1);
+PARAM_DEFINE_INT32(GF_BUFFER_ACTION, 0);
 
 /**
  * Use Pre-emptive geofence triggering
