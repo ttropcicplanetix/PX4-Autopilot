@@ -11,7 +11,6 @@ set(tests
     slice
     matrixMult
     vectorAssignment
-    matrixAssignment
     matrixScalarMult
     transpose
     vector
@@ -43,4 +42,5 @@ foreach(test_name ${tests})
     add_dependencies(test_results test-matrix_${test_name})
 endforeach()
 
+px4_add_unit_gtest(SRC MatrixAssignmentTest.cpp)
 px4_add_unit_gtest(SRC MatrixSparseVectorTest.cpp)
