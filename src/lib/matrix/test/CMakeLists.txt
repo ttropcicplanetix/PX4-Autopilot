@@ -16,7 +16,6 @@ set(tests
     vector
     vector2
     vector3
-    integration
     squareMatrix
     least_squares
     upperRightTriangle
@@ -43,4 +42,5 @@ px4_add_unit_gtest(SRC MatrixDualTest.cpp)
 px4_add_unit_gtest(SRC MatrixFilterTest.cpp)
 px4_add_unit_gtest(SRC MatrixHatveeTest.cpp)
 px4_add_unit_gtest(SRC MatrixHelperTest.cpp)
+px4_add_unit_gtest(SRC MatrixIntegralTest.cpp)
 px4_add_unit_gtest(SRC MatrixSparseVectorTest.cpp)
