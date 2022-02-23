@@ -9,7 +9,6 @@ set(tests
     setIdentity
     slice
     vectorAssignment
-    matrixScalarMult
     transpose
     vector
     vector2
@@ -43,4 +42,5 @@ px4_add_unit_gtest(SRC MatrixInverseTest.cpp)
 px4_add_unit_gtest(SRC MatrixLeastSquaresTest.cpp)
 px4_add_unit_gtest(SRC MatrixMultiplicationTest.cpp)
 px4_add_unit_gtest(SRC MatrixPseudoInverseTest.cpp)
+px4_add_unit_gtest(SRC MatrixScalarMultiplicationTest.cpp)
 px4_add_unit_gtest(SRC MatrixSparseVectorTest.cpp)
