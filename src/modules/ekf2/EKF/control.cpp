@@ -767,6 +767,15 @@ void Ekf::checkVerticalAccelerationHealth()
 	bool is_inertial_nav_falling = false;
 	bool are_vertical_pos_and_vel_independant = false;
 
+	if (_control_status.flags.gps) {
+		auto &gps_vel = _aid_src_gnss_vel;
+
+		if (gps_vel.time_last_fuse[2] > _vert_vel_fuse_time_us) {
+			_vert_vel_fuse_time_us = gps_vel.time_last_fuse[2];
+			_vert_vel_innov_ratio = gps_vel.innovation[2] / sqrtf(gps_vel.innovation_variance[2]);
+		}
+	}
+
 	if (isRecent(_vert_pos_fuse_attempt_time_us, 1000000)) {
 		if (isRecent(_vert_vel_fuse_time_us, 1000000)) {
 			// If vertical position and velocity come from independent sensors then we can
