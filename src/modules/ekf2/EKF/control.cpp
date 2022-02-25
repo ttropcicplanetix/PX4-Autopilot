@@ -455,6 +455,7 @@ void Ekf::controlOpticalFlowFusion()
 			// If the heading is valid and use is not inhibited , start using optical flow aiding
 			if (_control_status.flags.yaw_align || _params.mag_fusion_type == MAG_FUSE_TYPE_NONE) {
 				// set the flag and reset the fusion timeout
+				ECL_INFO("starting optical flow fusion");
 				_control_status.flags.opt_flow = true;
 				_time_last_of_fuse = _time_last_imu;
 
@@ -476,6 +477,8 @@ void Ekf::controlOpticalFlowFusion()
 				if (isRecent(_time_last_hagl_fuse, (uint64_t)10e6)) {
 					fuseOptFlow();
 					_last_known_posNE = _state.pos.xy();
+				} else {
+					ECL_WARN("can't fuse flow, hagl fuse old, %lu, %lu", _time_last_hagl_fuse, _time_last_imu);
 				}
 
 				_flow_data_ready = false;
@@ -491,7 +494,7 @@ void Ekf::controlOpticalFlowFusion()
 		}
 
 	} else if (_control_status.flags.opt_flow
-		   && (_imu_sample_delayed.time_us >  _flow_sample_delayed.time_us + (uint64_t)10e6)) {
+		   && (_imu_sample_delayed.time_us > _flow_sample_delayed.time_us + (uint64_t)10e6)) {
 
 		stopFlowFusion();
 	}

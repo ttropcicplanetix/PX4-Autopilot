@@ -175,6 +175,7 @@ void Ekf::fuseOptFlow()
 	if (_flow_innov_var(0) < R_LOS) {
 		// we need to reinitialise the covariance matrix and abort this fusion step
 		initialiseCovariance();
+		ECL_WARN("flow fusion failed (reinit covariance)");
 		return;
 	}
 	const float HK50 = HK4/_flow_innov_var(0);
@@ -230,6 +231,7 @@ void Ekf::fuseOptFlow()
 	if (_flow_innov_var(1) < R_LOS) {
 		// we need to reinitialise the covariance matrix and abort this fusion step
 		initialiseCovariance();
+		ECL_WARN("flow fusion failed (reinit covariance)");
 		return;
 	}
 	const float HK95 = HK4/_flow_innov_var(1);
@@ -249,14 +251,13 @@ void Ekf::fuseOptFlow()
 
 		} else {
 			_innov_check_fail_status.value &= ~(1 << (obs_index + 10));
-
 		}
 	}
 
 	// if either axis fails we abort the fusion
 	if (flow_fail) {
+		ECL_WARN("flow fusion failed");
 		return;
-
 	}
 
 	// fuse observation axes sequentially

@@ -61,7 +61,11 @@ public:
 
 	using SparseVector24f = matrix::SparseVectorf<24, Idxs...>;
 
-	Ekf() = default;
+	Ekf()
+	{
+		reset();
+	};
+
 	virtual ~Ekf() = default;
 
 	// initialise variables to sane values (also interface class)
