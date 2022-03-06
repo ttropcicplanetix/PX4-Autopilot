@@ -47,7 +47,7 @@
 #include <math.h>
 #include <poll.h>
 
-#ifdef CONFIG_NET
+#ifdef CONFIG_NET_UDP
 #include <net/if.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
@@ -63,7 +63,7 @@
 
 #include <lib/drivers/device/Device.hpp> // For DeviceId union
 
-#ifdef CONFIG_NET
+#ifdef CONFIG_NET_UDP
 #define MAVLINK_RECEIVER_NET_ADDED_STACK 1360
 #else
 #define MAVLINK_RECEIVER_NET_ADDED_STACK 0
@@ -3091,7 +3091,7 @@ MavlinkReceiver::run()
 #if defined(__PX4_POSIX)
 	/* 1500 is the Wifi MTU, so we make sure to fit a full packet */
 	uint8_t buf[1600 * 5];
-#elif defined(CONFIG_NET)
+#elif defined(CONFIG_NET_UDP)
 	/* 1500 is the Wifi MTU, so we make sure to fit a full packet */
 	uint8_t buf[1000];
 #else
