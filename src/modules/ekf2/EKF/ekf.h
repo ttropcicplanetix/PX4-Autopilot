@@ -514,8 +514,8 @@ private:
 
 	float _baro_hgt_offset{0.0f};		///< baro height reading at the local NED origin (m)
 	float _gps_hgt_offset{0.0f};		///< GPS height reading at the local NED origin (m)
-	float _rng_hgt_offset{0.0f};		///< GPS height reading at the local NED origin (m)
-	float _ev_hgt_offset{0.0f};		///< GPS height reading at the local NED origin (m)
+	float _rng_hgt_offset{0.0f};		///< Range height reading at the local NED origin (m)
+	float _ev_hgt_offset{0.0f};		///< EV height reading at the local NED origin (m)
 
 	float _baro_hgt_bias{0.0f};
 	float _baro_hgt_bias_var{1.f};
