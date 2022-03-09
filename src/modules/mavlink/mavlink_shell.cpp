@@ -74,6 +74,13 @@ int MavlinkShell::start()
 	return -1;
 #endif /* __PX4_NUTTX */
 
+	/*
+	 * Ensure that during the temporary phase no other thread from the same task writes to
+	 * stdout (as it would end up in the pipe).
+	 */
+#ifdef __PX4_NUTTX
+	sched_lock();
+#endif /* __PX4_NUTTX */
 
 	PX4_INFO("Starting mavlink shell");
 
@@ -98,18 +105,11 @@ int MavlinkShell::start()
 
 	int ret = 0;
 
-	_from_shell_fd  = p1[0];
+	_from_shell_fd = p1[0];
 	_to_shell_fd = p2[1];
-	_shell_fds[0]  = p2[0];
+	_shell_fds[0] = p2[0];
 	_shell_fds[1] = p1[1];
 
-	/*
-	 * Ensure that during the temporary phase no other thread from the same task writes to
-	 * stdout (as it would end up in the pipe).
-	 */
-#ifdef __PX4_NUTTX
-	sched_lock();
-#endif /* __PX4_NUTTX */
 	fflush(stdout);
 	fflush(stderr);
 
@@ -148,13 +148,13 @@ int MavlinkShell::start()
 		close(fd_backups[i]);
 	}
 
+	// close unused pipe fd's
+	close(_shell_fds[0]);
+	close(_shell_fds[1]);
+
 #ifdef __PX4_NUTTX
 	sched_unlock();
 #endif /* __PX4_NUTTX */
-
-	//close unused pipe fd's
-	close(_shell_fds[0]);
-	close(_shell_fds[1]);
 
 	return ret;
 }
