@@ -63,6 +63,7 @@
 #include "common.h"
 #include "RingBuffer.h"
 #include "imu_down_sampler.hpp"
+#include "range_finder_consistency_check.hpp"
 #include "sensor_range_finder.hpp"
 #include "utils.hpp"
 
@@ -77,13 +78,13 @@ class EstimatorInterface
 {
 public:
 	// ask estimator for sensor data collection decision and do any preprocessing if required, returns true if not defined
-	virtual bool collect_gps(const gps_message &gps) = 0;
+	virtual bool collect_gps(const gpsMessage &gps) = 0;
 
 	void setIMUData(const imuSample &imu_sample);
 
 	void setMagData(const magSample &mag_sample);
 
-	void setGpsData(const gps_message &gps);
+	void setGpsData(const gpsMessage &gps);
 
 	void setBaroData(const baroSample &baro_sample);
 
@@ -205,7 +206,7 @@ public:
 	// At the next startup, set param.mag_declination_deg to the value saved
 	bool get_mag_decl_deg(float *val) const
 	{
-		if (_NED_origin_initialised && (_params.mag_declination_source & MASK_SAVE_GEO_DECL)) {
+		if (_NED_origin_initialised && (_params.mag_declination_source & GeoDeclinationMask::SAVE_GEO_DECL)) {
 			*val = math::degrees(_mag_declination_gps);
 			return true;
 
@@ -258,12 +259,7 @@ public:
 
 protected:
 
-	EstimatorInterface()
-	{
-		_control_status.flags.in_air = true;
-		_control_status.flags.vehicle_at_rest = false;
-	};
-
+	EstimatorInterface() = default;
 	virtual ~EstimatorInterface();
 
 	virtual bool init(uint64_t timestamp) = 0;
@@ -302,12 +298,14 @@ protected:
 	extVisionSample _ev_sample_delayed_prev{};
 	dragSample _drag_down_sampled{};	// down sampled drag specific force data (filter prediction rate -> observation rate)
 
+	RangeFinderConsistencyCheck _rng_consistency_check;
+
 	float _air_density{CONSTANTS_AIR_DENSITY_SEA_LEVEL_15C};		// air density (kg/m**3)
 
 	// Sensor limitations
-	float _flow_max_rate{0.0f}; ///< maximum angular flow rate that the optical flow sensor can measure (rad/s)
+	float _flow_max_rate{1.0f}; ///< maximum angular flow rate that the optical flow sensor can measure (rad/s)
 	float _flow_min_distance{0.0f};	///< minimum distance that the optical flow sensor can operate at (m)
-	float _flow_max_distance{0.0f};	///< maximum distance that the optical flow sensor can operate at (m)
+	float _flow_max_distance{10.f};	///< maximum distance that the optical flow sensor can operate at (m)
 
 	// Output Predictor
 	outputSample _output_new{};		// filter output on the non-delayed time horizon
@@ -331,15 +329,11 @@ protected:
 
 	// innovation consistency check monitoring ratios
 	float _yaw_test_ratio{};		// yaw innovation consistency check ratio
-	AlphaFilter<float>_yaw_signed_test_ratio_lpf{0.1f}; // average signed test ratio used to detect a bias in the state
+	AlphaFilter<float> _yaw_signed_test_ratio_lpf{0.1f}; // average signed test ratio used to detect a bias in the state
 	Vector3f _mag_test_ratio{};		// magnetometer XYZ innovation consistency check ratios
-	Vector2f _gps_vel_test_ratio{};		// GPS velocity innovation consistency check ratios
-	Vector2f _gps_pos_test_ratio{};		// GPS position innovation consistency check ratios
 	Vector2f _ev_vel_test_ratio{};		// EV velocity innovation consistency check ratios
 	Vector2f _ev_pos_test_ratio{};		// EV position innovation consistency check ratios
 	Vector2f _aux_vel_test_ratio{};		// Auxiliary horizontal velocity innovation consistency check ratio
-	float _baro_hgt_test_ratio{};	// baro height innovation consistency check ratios
-	float _rng_hgt_test_ratio{};		// range finder height innovation consistency check ratios
 	float _optflow_test_ratio{};		// Optical flow innovation consistency check ratio
 	float _tas_test_ratio{};		// tas innovation consistency check ratio
 	float _hagl_test_ratio{};		// height above terrain measurement innovation consistency check ratio
@@ -349,9 +343,9 @@ protected:
 
 	bool _deadreckon_time_exceeded{true};	// true if the horizontal nav solution has been deadreckoning for too long and is invalid
 
-	float _gps_horizontal_position_drift_rate_m_s{0}; // Horizontal position drift rate (m/s)
-	float _gps_vertical_position_drift_rate_m_s{0};   // Vertical position drift rate (m/s)
-	float _gps_filtered_horizontal_velocity_m_s{0};   // Filtered horizontal velocity (m/s)
+	float _gps_horizontal_position_drift_rate_m_s{NAN}; // Horizontal position drift rate (m/s)
+	float _gps_vertical_position_drift_rate_m_s{NAN};   // Vertical position drift rate (m/s)
+	float _gps_filtered_horizontal_velocity_m_s{NAN};   // Filtered horizontal velocity (m/s)
 
 	uint64_t _time_last_on_ground_us{0};	///< last time we were on the ground (uSec)
 	uint64_t _time_last_in_air{0};		///< last time we were in air (uSec)

@@ -75,6 +75,9 @@ void Ekf::reset()
 	_control_status.value = 0;
 	_control_status_prev.value = 0;
 
+	_control_status.flags.in_air = true;
+	_control_status_prev.flags.in_air = true;
+
 	_ang_rate_delayed_raw.zero();
 
 	_fault_status.value = 0;
@@ -171,7 +174,7 @@ bool Ekf::initialiseFilter()
 		}
 	}
 
-	if (_params.mag_fusion_type <= MAG_FUSE_TYPE_3D) {
+	if (_params.mag_fusion_type <= MagFuseType::MAG_3D) {
 		if (_mag_counter < _obs_buffer_length) {
 			// not enough mag samples accumulated
 			return false;
@@ -199,7 +202,7 @@ bool Ekf::initialiseFilter()
 	initialiseCovariance();
 
 	// update the yaw angle variance using the variance of the measurement
-	if (_params.mag_fusion_type <= MAG_FUSE_TYPE_3D) {
+	if (_params.mag_fusion_type <= MagFuseType::MAG_3D) {
 		// using magnetic heading tuning parameter
 		increaseQuatYawErrVariance(sq(fmaxf(_params.mag_heading_noise, 1.0e-2f)));
 	}
