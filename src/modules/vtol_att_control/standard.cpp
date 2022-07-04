@@ -148,6 +148,7 @@ void Standard::update_vtol_state()
 			_vtol_schedule.flight_mode = vtol_mode::FW_MODE;
 			mc_weight = 0.0f;
 
+
 		} else if (_vtol_schedule.flight_mode == vtol_mode::TRANSITION_TO_FW) {
 			// continue the transition to fw mode while monitoring airspeed for a final switch to fw mode
 
